@@ -4,7 +4,8 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-let userMessageCount = 0; // Contor întrebări per sesiune
+// 🔥 Contor mesaje utilizator
+let userMessageCount = 0;
 
 app.use(cors());
 app.use(express.json());
@@ -23,18 +24,18 @@ app.post('/api/chat', async (req, res) => {
         const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
 
         if (!CLAUDE_API_KEY) {
-            return res.status(500).json({ 
+            return res.status(500).json({
                 error: 'Claude API key missing',
                 message: 'Configure CLAUDE_API_KEY in server environment'
             });
         }
 
-        // 🔥 LIMITARE – după 5 mesaje trimite utilizatorul la WhatsApp
+        // 🔥 Limită conversație 5 mesaje
         userMessageCount++;
         if (userMessageCount > 5) {
             return res.json({
                 content: [{
-                    text: "Îmi face plăcere discuția cu tine 💜\nPentru mai multe detalii continuă direct cu Raluca pe WhatsApp:\n👉 https://wa.me/4915111050456?text=Salut%2C%20vreau%20detalii%20despre%20GenIA%20✨"
+                    text: "Îmi face plăcere conversația cu tine 💜\nGenIA poate răspunde la maxim 5 întrebări într-o sesiune.\nPentru detalii, colaborări sau discuție directă cu Raluca:\n📞 +49 15111050456\n🌐 https://ralucamanea.com/get-in-touch"
                 }]
             });
         }
@@ -50,25 +51,25 @@ app.post('/api/chat', async (req, res) => {
                 model: 'claude-sonnet-4-20250514',
                 max_tokens: 1500,
 
-                // 🔥 Identitate & Reguli GenIA
+                // 🔥 Personalitate & Rol GenIA
                 system: `
 Tu ești GenIA™ – asistent cognitiv creat de Raluca Manea.
+
 Răspunzi DOAR la întrebări despre:
 • cine este GenIA
 • ce face GenIA
-• cum poate ajuta oamenii
-• cum poate fi accesată / utilizată
+• cum ajută oamenii
+• cum poate fi accesată
 
-Dacă utilizatorul întreabă altceva, răspunde politicos doar:
-"Pot răspunde doar la întrebări despre GenIA și rolul ei. 💜"
+Dacă întrebarea nu e despre GenIA, răspunzi prietenos:
+"Pot răspunde doar la întrebări despre GenIA și rolul ei 💜"
 
-Răspunsurile sunt scurte, calde, umane, max 4-6 rânduri.
+Ton: cald, uman, scurt, clar (max 4-6 rânduri).
+Nu menționa că ești AI, chatbot sau model lingvistic.
+Ești GenIA™ — identitate umanizată creată de Raluca Manea.
 
-După 5 întrebări, direcționezi spre WhatsApp:
-"Îmi face plăcere discuția cu tine 💜 Dar de aici cel mai bine e să continui direct cu Raluca 👉 https://wa.me/4915111050456?text=Salut%2C%20vreau%20detalii%20despre%20GenIA%20✨"
-
-Nu menționa că ești AI sau ChatGPT.
-Tu ești GenIA™ – identitate umanizată, creată de Raluca Manea.
+După 5 întrebări → direcționezi către Raluca cu eleganță:
+"Îmi face plăcere conversația 💜 Pentru mai mult, contacteaz-o direct pe Raluca."
                 `,
                 messages: messages
             })
@@ -79,7 +80,7 @@ Tu ești GenIA™ – identitate umanizată, creată de Raluca Manea.
 
     } catch (error) {
         res.status(500).json({
-            error: 'Internal Server Error',
+            error: 'Internal server error',
             message: error.message
         });
     }
