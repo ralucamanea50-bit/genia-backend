@@ -1,15 +1,11 @@
 {
   "name": "genia-backend",
   "version": "1.0.0",
-  "description": "GenIA™ Backend Server for Raluca",
+  "description": "GenIA Backend",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
-  "keywords": ["chatbot", "claude", "genia"],
-  "author": "Raluca",
-  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5"
