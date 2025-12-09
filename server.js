@@ -4,6 +4,8 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+let userMessageCount = 0; // Contor întrebări per sesiune
+
 app.use(cors());
 app.use(express.json());
 
@@ -17,20 +19,23 @@ app.get('/', (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
     try {
-        const { messages, system } = req.body;
+        const { messages } = req.body;
         const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
-        
+
         if (!CLAUDE_API_KEY) {
-            return res.status(500).json({
-                error: 'Server configuration error',
-                message: 'Claude API key not configured on server'
+            return res.status(500).json({ 
+                error: 'Claude API key missing',
+                message: 'Configure CLAUDE_API_KEY in server environment'
             });
         }
 
-        if (!messages || !Array.isArray(messages)) {
-            return res.status(400).json({
-                error: 'Invalid request',
-                message: 'Messages array is required'
+        // 🔥 LIMITARE – după 5 mesaje trimite utilizatorul la WhatsApp
+        userMessageCount++;
+        if (userMessageCount > 5) {
+            return res.json({
+                content: [{
+                    text: "Îmi face plăcere discuția cu tine 💜\nPentru mai multe detalii continuă direct cu Raluca pe WhatsApp:\n👉 https://wa.me/4915111050456?text=Salut%2C%20vreau%20detalii%20despre%20GenIA%20✨"
+                }]
             });
         }
 
@@ -44,37 +49,43 @@ app.post('/api/chat', async (req, res) => {
             body: JSON.stringify({
                 model: 'claude-sonnet-4-20250514',
                 max_tokens: 1500,
-                system: system || 'You are a helpful assistant.',
+
+                // 🔥 Identitate & Reguli GenIA
+                system: `
+Tu ești GenIA™ – asistent cognitiv creat de Raluca Manea.
+Răspunzi DOAR la întrebări despre:
+• cine este GenIA
+• ce face GenIA
+• cum poate ajuta oamenii
+• cum poate fi accesată / utilizată
+
+Dacă utilizatorul întreabă altceva, răspunde politicos doar:
+"Pot răspunde doar la întrebări despre GenIA și rolul ei. 💜"
+
+Răspunsurile sunt scurte, calde, umane, max 4-6 rânduri.
+
+După 5 întrebări, direcționezi spre WhatsApp:
+"Îmi face plăcere discuția cu tine 💜 Dar de aici cel mai bine e să continui direct cu Raluca 👉 https://wa.me/4915111050456?text=Salut%2C%20vreau%20detalii%20despre%20GenIA%20✨"
+
+Nu menționa că ești AI sau ChatGPT.
+Tu ești GenIA™ – identitate umanizată, creată de Raluca Manea.
+                `,
                 messages: messages
             })
         });
-
-        if (!response.ok) {
-            const errorData = await response.text();
-            console.error('Claude API Error:', errorData);
-            return res.status(response.status).json({
-                error: 'Claude API error',
-                message: 'Failed to get response from Claude',
-                details: errorData
-            });
-        }
 
         const data = await response.json();
         res.json(data);
 
     } catch (error) {
-        console.error('Server Error:', error);
         res.status(500).json({
-            error: 'Internal server error',
+            error: 'Internal Server Error',
             message: error.message
         });
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 GenIA™ Backend Server running on port ${PORT}`);
-    console.log(`📍 Health check: http://localhost:${PORT}/`);
+    console.log(`🚀 GenIA™ Backend Running on port ${PORT}`);
     console.log(`📍 Chat endpoint: http://localhost:${PORT}/api/chat`);
-    console.log(`✅ CORS enabled for all origins`);
-    console.log(`🔑 API Key configured: ${process.env.CLAUDE_API_KEY ? 'YES ✓' : 'NO ✗'}`);
 });
