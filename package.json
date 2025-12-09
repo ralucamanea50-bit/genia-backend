@@ -18,14 +18,3 @@
     "node": ">=18.0.0"
   }
 }
-```
-
-4. **Commit new file**
-
----
-
-## 📋 **RECAP:**
-```
-✅ server.js - CREAT și CORECT!
-🔄 Acum: Salvează-l (Commit new file)
-⏭️ Apoi: Creează package.json
